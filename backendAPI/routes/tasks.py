@@ -80,8 +80,14 @@ def editar_tarefa_especifica(id):
         return jsonify ({"mensagem": "Dados do JSON inválidos."})
 
     try:
+        campos_permitidos = ['titulo', 'descricao', 'concluida']
+
         for chave, valor in data.items():
-            if hasattr(tarefa, chave):
+
+            if not chave in campos_permitidos:
+                return jsonify({"mensagem":"Campo imutavel foi escolhido"})
+
+            elif chave in campos_permitidos and hasattr(tarefa, chave):
                 setattr(tarefa, chave, valor)
 
         db.session.commit()
