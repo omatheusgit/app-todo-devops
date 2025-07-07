@@ -1,20 +1,22 @@
 import os
-from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
-# Imports dos Blueprints
-from backendAPI.routes.tasks import tasks_bp
-from backendAPI.app          import app_bp
+db = SQLAlchemy()
 
-load_dotenv() # carrega as .env
+def create_app():
+    load_dotenv()
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLSQLALCHEMY_DATABASE_URI')
-# configuração para habilitar ou desabilitar modificações de rastreamento de objetos. Reduz memoria
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+    db.init_app(app)
 
-# Registro dos blueprints
-app.register_blueprint(tasks_bp)
-app.register_blueprint(app_bp)
+    # Importações internas e registro dos blueprints
+    from .routes.tasks import tasks_bp
+    from .routes.health import health_bp
+    app.register_blueprint(tasks_bp)
+    app.register_blueprint(health_bp)
+
+    return app

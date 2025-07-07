@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify, Response
+from backendAPI import db
+from backendAPI.models.tasks import Tasks
 
 tasks_bp = Blueprint('tasks',__name__, url_prefix='/tasks')
 
@@ -9,21 +11,22 @@ def listar_tarefas():
 
 @tasks_bp.route('/', methods=['POST'])
 def criar__tarefa():
-    dados_tarefa = {
-        "titulo": titulo,
-        "descricao": descricao,
-        "concluida": concluida,
-        "data_criacao": data_criacao
-    }
-    if Response.status_code == 200:
+    
+    data = request.get_json()
+    nova_tarefa = Tasks(
+        titulo = data["titulo"],
+        descricao = data["descricao"],
+    )
+    try:
+        db.session.add(nova_tarefa)
+        db.session.commit()
         return jsonify (
-            data = {"mensagem": "Tarefa criada com sucesso."}
-            ), 200
-    else:
+            {"mensagem": "Tarefa criada com sucesso."}
+            ), 201
+    except:
         return jsonify(
-            data = {"messagem":"Erro ao criar tarefa"}
-        )
-        
+            {"mensagem":"Erro ao criar tarefa"}
+            ), 400
 
 @tasks_bp.route('/<int:id>', methods=['GET'])
 def listar_tarefa_especifica(id):
