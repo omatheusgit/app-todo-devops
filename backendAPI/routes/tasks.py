@@ -4,11 +4,6 @@ from backendAPI.models.tasks import Tasks
 
 tasks_bp = Blueprint('tasks',__name__, url_prefix='/tasks')
 
-@tasks_bp.route('/', methods=['GET'])
-def listar_tarefas():
-    data = {'messagem':'OK'}
-    return jsonify (data)
-
 @tasks_bp.route('/', methods=['POST'])
 def criar__tarefa():
     
@@ -27,6 +22,28 @@ def criar__tarefa():
         db.session.rollback()
         return jsonify(
             {"mensagem":"Erro ao criar tarefa"}
+            ), 400
+
+@tasks_bp.route('/', methods=['GET'])
+def listar_tarefas():
+    
+    try:
+        dados_tarefa = Tasks.query.all()
+
+        tarefas = []
+        for data in dados_tarefa:
+            tarefas.append({
+                "id": data.id,
+                "titulo": data.titulo,
+                "descricao": data.descricao,
+                "data_criacao": data.data_criacao,
+                "data_conclusao": data.data_conclusao,
+                "concluida":data.concluida
+            })
+        return jsonify(tarefas)
+    except:
+        return jsonify(
+            {"mensagem":"Erro ao consultar tarefas"}
             ), 400
 
 @tasks_bp.route('/<int:id>', methods=['GET'])
