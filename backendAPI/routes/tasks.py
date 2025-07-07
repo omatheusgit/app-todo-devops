@@ -24,6 +24,7 @@ def criar__tarefa():
             {"mensagem": "Tarefa criada com sucesso."}
             ), 201
     except:
+        db.session.rollback()
         return jsonify(
             {"mensagem":"Erro ao criar tarefa"}
             ), 400
