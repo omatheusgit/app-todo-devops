@@ -100,4 +100,16 @@ def editar_tarefa_especifica(id):
     
 @tasks_bp.route('/<int:id>', methods=['DELETE'])
 def deletar_tarefa_especifica(id):
-    return
+    tarefa = Tasks.query.get(id)
+    
+    if not tarefa:
+        return jsonify({"mensagem": "Tarefa não encontrada"})
+    
+    try:
+        db.session.delete(tarefa)
+        db.session.commit()
+        return jsonify({"mensagem": "Tarefa excluída com sucesso."})
+    
+    except:
+        db.session.rollback()
+        return jsonify({"mensagem": "Erro ao tentar excluir a tarefa."})
