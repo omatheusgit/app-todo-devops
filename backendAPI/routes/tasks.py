@@ -48,28 +48,50 @@ def listar_tarefas():
 
 @tasks_bp.route('/<int:id>', methods=['GET'])
 def listar_tarefa_especifica(id):
-    dados_tarefa = {
-        "id": id,
-        "titulo": titulo,
-        "descricao": descricao,
-        "concluida": concluida,
-        "data_criacao": data_criacao
-    }
-    if Response.status_code == 200:
-        return jsonify(
-            data = {"mensagem": "Tarefa editada com sucesso."}
-            ), 200
-    else:
-        return jsonify(
-            data = {"messagem": "Erro ao buscar tarefa"}
-            )
+    try:
+        dados_tarefa = Tasks.query.get(id)
+
+        if (dados_tarefa) is None:
+            return jsonify ({"mensagem":"Tarefa não encontrada"}), 404
+        
+        tarefa = {
+                "id": dados_tarefa.id,
+                "titulo": dados_tarefa.titulo,
+                "descricao": dados_tarefa.descricao,
+                "data_criacao": dados_tarefa.data_criacao,
+                "data_conclusao": dados_tarefa.data_conclusao,
+                "concluida":dados_tarefa.concluida
+        }
+
+        return jsonify (tarefa), 201
+
+    except:
+        return jsonify ({"mensagem": "Erro ao consultar tarefa"}), 400
 
 @tasks_bp.route('/<int:id>', methods=['PUT'])
 def editar_tarefa_especifica(id):
-    if Response.status_code == 200:
-        data = {}
-        return jsonify(data)
+    
+    tarefa = Tasks.query.get(id)
+    if tarefa is None:
+        return jsonify ({"mensagem":"Tarefa não encontrada"}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify ({"mensagem": "Dados do JSON inválidos."})
 
+    try:
+        for chave, valor in data.items():
+            if hasattr(tarefa, chave):
+                setattr(tarefa, chave, valor)
+
+        db.session.commit()
+
+        return jsonify({"mensagem":"Tarefa atualiza com sucesso."})
+    
+    except:
+        db.session.rollback()
+        return jsonify({"mensagem": "Erro ao tentar atualizar a tarefa."})
+    
 @tasks_bp.route('/<int:id>', methods=['DELETE'])
 def deletar_tarefa_especifica(id):
     return
