@@ -41,6 +41,7 @@ def listar_tarefas():
                 "concluida":data.concluida
             })
         return jsonify(tarefas)
+    
     except:
         return jsonify(
             {"mensagem":"Erro ao consultar tarefas"}
