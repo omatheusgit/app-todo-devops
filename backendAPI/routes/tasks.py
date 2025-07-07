@@ -26,11 +26,10 @@ def criar__tarefa():
 
 @tasks_bp.route('/', methods=['GET'])
 def listar_tarefas():
-    
     try:
         dados_tarefa = Tasks.query.all()
-
         tarefas = []
+
         for data in dados_tarefa:
             tarefas.append({
                 "id": data.id,
