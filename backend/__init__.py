@@ -10,7 +10,9 @@ db = SQLAlchemy()
 def create_app():
     load_dotenv()
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    db_path = os.getenv('SQLITE_PATH')
+    db_abspath = os.path.abspath(db_path)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_abspath
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
