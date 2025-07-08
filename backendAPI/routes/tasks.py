@@ -1,12 +1,45 @@
 from flask import Blueprint, request, jsonify, Response
 from backendAPI import db
 from backendAPI.models.tasks import Tasks
+from flasgger import swag_from
 
 tasks_bp = Blueprint('tasks',__name__, url_prefix='/tasks')
 
 @tasks_bp.route('/', methods=['POST'])
+@swag_from({
+    'tags': ['Tarefas'],
+    'operationId': 'criarTarefa',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'titulo': {
+                        'type': 'string',
+                        'example': 'Comprar pão'
+                    },
+                    'descricao': {
+                        'type': 'string',
+                        'example': 'Ir à padaria e comprar 2 pães'
+                    }
+                },
+                'required': ['titulo', 'descricao']
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'Tarefa criada com sucesso.'
+        },
+        400: {
+            'description': 'Erro ao criar tarefa.'
+        }
+    }
+})
 def criar__tarefa():
-    
     data = request.get_json()
     nova_tarefa = Tasks(
         titulo = data["titulo"],
@@ -26,6 +59,19 @@ def criar__tarefa():
 
 @tasks_bp.route('/', methods=['GET'])
 def listar_tarefas():
+    """
+    Retorna a lista de todas as tarefas cadastradas.
+    ---
+    operationId: listarTarefas
+    tags:
+      - Tarefas
+    responses:
+      200:
+        description: Lista de tarefas retornada com sucesso.
+      400:
+        description: Erro ao consultar tarefas.
+    """
+
     try:
         dados_tarefa = Tasks.query.all()
         tarefas = []
@@ -48,6 +94,27 @@ def listar_tarefas():
 
 @tasks_bp.route('/<int:id>', methods=['GET'])
 def listar_tarefa_especifica(id):
+    """
+    Retorna os dados de uma tarefa específica pelo ID.
+    ---
+    operationId: listarTarefaPorId
+    tags:
+      - Tarefas
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Tarefa encontrada com sucesso.
+      404:
+        description: Tarefa não encontrada.
+      400:
+        description: Erro ao consultar tarefa.
+    """
+    
     try:
         dados_tarefa = Tasks.query.get(id)
 
@@ -69,8 +136,54 @@ def listar_tarefa_especifica(id):
         return jsonify ({"mensagem": "Erro ao consultar tarefa"}), 400
 
 @tasks_bp.route('/<int:id>', methods=['PUT'])
+@swag_from({
+    'tags': ['Tarefas'],
+    'operationId': 'editarTarefa',
+    'parameters': [
+        {
+            'name': 'id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID da tarefa a ser editada'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'titulo': {
+                        'type': 'string',
+                        'example': 'Atualizar título'
+                    },
+                    'descricao': {
+                        'type': 'string',
+                        'example': 'Atualizar descrição'
+                    },
+                    'concluida': {
+                        'type': 'boolean',
+                        'example': True
+                    }
+                },
+                'required': ['titulo', 'descricao']
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Tarefa atualizada com sucesso.'
+        },
+        400: {
+            'description': 'Erro ao atualizar tarefa.'
+        },
+        404: {
+            'description': 'Tarefa não encontrada.'
+        }
+    }
+})
 def editar_tarefa_especifica(id):
-    
     tarefa = Tasks.query.get(id)
     if tarefa is None:
         return jsonify ({"mensagem":"Tarefa não encontrada"}), 404
@@ -100,6 +213,27 @@ def editar_tarefa_especifica(id):
     
 @tasks_bp.route('/<int:id>', methods=['DELETE'])
 def deletar_tarefa_especifica(id):
+    """
+    Exclui uma tarefa específica com base no ID.
+    ---
+    operationId: excluirTarefa
+    tags:
+      - Tarefas
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Tarefa excluída com sucesso.
+      400:
+        description: Erro ao tentar excluir a tarefa.
+      404:
+        description: Tarefa não encontrada.
+    """
+
     tarefa = Tasks.query.get(id)
     
     if not tarefa:
