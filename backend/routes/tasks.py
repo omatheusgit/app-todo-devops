@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, Response
-from backendAPI import db
-from backendAPI.models.tasks import Tasks
+from backend import db
+from backend.models.tasks import Tasks
 from flasgger import swag_from
 
 tasks_bp = Blueprint('tasks',__name__, url_prefix='/tasks')

@@ -1,4 +1,4 @@
-from backendAPI import db, create_app
+from backend import db, create_app
 
 # Para recriar o banco de dados, executar: 
 # python -m backendAPI.models.recria_bd
