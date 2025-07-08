@@ -3,6 +3,9 @@ from backend import db
 from backend.models.tasks import Tasks
 from flasgger import swag_from
 
+import locale
+locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+
 tasks_bp = Blueprint('tasks',__name__, url_prefix='/tasks')
 
 @tasks_bp.route('/', methods=['POST'])
@@ -73,17 +76,17 @@ def listar_tarefas():
     """
 
     try:
-        dados_tarefa = Tasks.query.all()
+        dados_tarefas = Tasks.query.all()
         tarefas = []
 
-        for data in dados_tarefa:
+        for dado in dados_tarefas:
             tarefas.append({
-                "id": data.id,
-                "titulo": data.titulo,
-                "descricao": data.descricao,
-                "data_criacao": data.data_criacao,
-                "data_conclusao": data.data_conclusao,
-                "concluida":data.concluida
+                "id": dado.id,
+                "titulo": dado.titulo,
+                "descricao": dado.descricao,
+                "data_criacao": dado.data_criacao.strftime("%A, %d de %B às %H:%M").capitalize().replace("-feira", "") if dado.data_criacao else None,
+                "data_conclusao": dado.data_conclusao.strftime("%A, %d de %B às %H:%M").capitalize().replace("-feira", "") if dado.data_conclusao else None,
+                "concluida":dado.concluida,
             })
         return jsonify(tarefas)
     
@@ -125,8 +128,8 @@ def listar_tarefa_especifica(id):
                 "id": dados_tarefa.id,
                 "titulo": dados_tarefa.titulo,
                 "descricao": dados_tarefa.descricao,
-                "data_criacao": dados_tarefa.data_criacao,
-                "data_conclusao": dados_tarefa.data_conclusao,
+                "data_criacao": dados_tarefa.data_criacao.strftime("%A, %d de %B às %H:%M").capitalize().replace("-feira", "") if dados_tarefa.data_criacao else None,
+                "data_conclusao": dados_tarefa.data_conclusao.strftime("%A, %d de %B às %H:%M").capitalize().replace("-feira", "") if dados_tarefa.data_criacao else None,
                 "concluida":dados_tarefa.concluida
         }
 
