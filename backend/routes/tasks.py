@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, Response
+from datetime import datetime
 from backend import db
 from backend.models.tasks import Tasks
 from flasgger import swag_from
@@ -44,9 +45,13 @@ tasks_bp = Blueprint('tasks',__name__, url_prefix='/tasks')
 })
 def criar__tarefa():
     data = request.get_json()
+
+    data_criacao = datetime.strptime(data.get("data_criacao"), "%Y-%m-%d %H:%M") if data.get("data_criacao") else datetime.utcnow()
+    
     nova_tarefa = Tasks(
         titulo = data["titulo"],
         descricao = data["descricao"],
+        data_criacao = data_criacao
     )
     try:
         db.session.add(nova_tarefa)

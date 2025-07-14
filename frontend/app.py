@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import os
+import pandas as pd
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Configurações iniciais
@@ -40,28 +42,44 @@ def buscar_tarefas():
 
 # Criar nova tarefa
 with st.expander("➕ Criar nova tarefa"):
-    titulo = st.text_input("Título")
-    descricao = st.text_area("Descrição")
+    titulo = st.text_input("Título", key="titulo")
+    descricao = st.text_area("Descrição", key="descricao")
+    data = st.date_input("Data da tarefa")
+    hora = st.time_input("Hora da tarefa")
+    
     if st.button("Salvar tarefa"):
-        if titulo and descricao:
-            payload = {"titulo": titulo, "descricao": descricao}
+        
+        if not titulo or not descricao:
+            st.warning("Preencha todos os campos.")
+        
+        else:
+            data_criacao = datetime.combine(data, hora)
+            payload = {
+                "titulo": titulo, 
+                "descricao": descricao,
+                "data_criacao": data_criacao.strftime("%Y-%m-%d %H:%M")
+
+            }
+
             try:
-                res = requests.post(API_URL, json=payload)
-                if res.status_code == 201:
+                response = requests.post(API_URL, json=payload)
+                if response.status_code == 201:
                     st.success("Tarefa criada com sucesso!")
-                    st.rerun()
+                    # st.rerun()
                 else:
                     st.error("Erro ao criar tarefa.")
             except Exception as e:
                 st.error(f"Erro: {e}")
-        else:
-            st.warning("Preencha todos os campos.")
 
 # Mostrar tarefas
 st.subheader("📋 Tarefas registradas")
 tarefas = buscar_tarefas()
 
 if tarefas:
-    st.table(tarefas)
+    # remover indice do componente
+    df = pd.DataFrame(tarefas)
+    df.reset_index(drop=True, inplace=True)
+    st.dataframe(df, hide_index=True)
 else:
     st.info("Nenhuma tarefa encontrada.")
+    
