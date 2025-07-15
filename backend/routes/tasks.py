@@ -125,7 +125,7 @@ def listar_tarefa_especifica(id):
     
     try:
         dados_tarefa = Tasks.query.get(id)
-
+    
         if (dados_tarefa) is None:
             return jsonify ({"mensagem":"Tarefa não encontrada"}), 404
         
@@ -133,15 +133,16 @@ def listar_tarefa_especifica(id):
                 "id": dados_tarefa.id,
                 "titulo": dados_tarefa.titulo,
                 "descricao": dados_tarefa.descricao,
-                "data_criacao": dados_tarefa.data_criacao.strftime("%A, %d de %B às %H:%M").capitalize().replace("-feira", "") if dados_tarefa.data_criacao else None,
-                "data_conclusao": dados_tarefa.data_conclusao.strftime("%A, %d de %B às %H:%M").capitalize().replace("-feira", "") if dados_tarefa.data_criacao else None,
+                "data_criacao": dados_tarefa.data_criacao.isoformat() if dados_tarefa.data_criacao else None,
+                "data_conclusao": dados_tarefa.data_conclusao.isoformat() if dados_tarefa.data_conclusao else None,
                 "concluida":dados_tarefa.concluida
         }
 
-        return jsonify (tarefa), 201
+        return jsonify (tarefa), 200
 
-    except:
-        return jsonify ({"mensagem": "Erro ao consultar tarefa"}), 400
+    except Exception as e:
+        return jsonify({"mensagem": f"Erro ao consultar tarefa: {str(e)}"}), 400
+
 
 @tasks_bp.route('/<int:id>', methods=['PUT'])
 @swag_from({
@@ -188,6 +189,9 @@ def listar_tarefa_especifica(id):
         },
         404: {
             'description': 'Tarefa não encontrada.'
+        },
+        500: {
+            'description': 'Erro interno ao atualizar a tarefa.'
         }
     }
 })
@@ -201,23 +205,24 @@ def editar_tarefa_especifica(id):
         return jsonify ({"mensagem": "Dados do JSON inválidos."})
 
     try:
-        campos_permitidos = ['titulo', 'descricao', 'concluida']
+        campos_permitidos = ['titulo', 'descricao', 'concluida', 'data_criacao', 'data_conclusao']
 
         for chave, valor in data.items():
-
             if not chave in campos_permitidos:
-                return jsonify({"mensagem":"Campo imutavel foi escolhido"})
+                return jsonify({"mensagem":"Campo imutavel foi escolhido"}), 400
 
-            elif chave in campos_permitidos and hasattr(tarefa, chave):
-                setattr(tarefa, chave, valor)
+            if chave in ['data_criacao', 'data_conclusao'] and valor:
+                valor = datetime.strptime(valor, "%Y-%m-%d %H:%M")
+
+            setattr(tarefa, chave, valor)
 
         db.session.commit()
 
-        return jsonify({"mensagem":"Tarefa atualiza com sucesso."})
+        return jsonify({"mensagem":"Tarefa atualiza com sucesso."}),200
     
-    except:
+    except Exception as e:
         db.session.rollback()
-        return jsonify({"mensagem": "Erro ao tentar atualizar a tarefa."})
+        return jsonify({"mensagem": "Erro ao tentar atualizar a tarefa."}), 500
     
 @tasks_bp.route('/<int:id>', methods=['DELETE'])
 def deletar_tarefa_especifica(id):
