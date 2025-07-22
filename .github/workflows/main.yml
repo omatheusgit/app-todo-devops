@@ -1,7 +1,5 @@
-name: CI - Build and Push to Docker Hub
-
+name: CI
 on:
-  # Permite acionar a pipeline manualmente pela interface do GitHub
   workflow_dispatch:
     inputs:
       tag:
