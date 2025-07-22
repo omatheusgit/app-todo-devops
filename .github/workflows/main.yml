@@ -27,7 +27,6 @@ jobs:
           images: omatheusdocker/prj-to-do-api
           tags: |
             type=ref,event=tag
-            type=input,event=workflow_dispatch
             type=raw,value=latest,enable=true
 
       - name: Extrair metadados (tags e labels) para o App
@@ -37,7 +36,6 @@ jobs:
           images: omatheusdocker/prj-to-do-app
           tags: |
             type=ref,event=tag
-            type=input,event=workflow_dispatch
             type=raw,value=latest,enable=true
 
       - name: Login no Docker Hub
