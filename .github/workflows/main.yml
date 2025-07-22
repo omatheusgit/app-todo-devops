@@ -1,12 +1,6 @@
 name: CI
+
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'A tag para as imagens Docker (ex: v1.0.0)'
-        required: true
-        default: 'latest'
-  # Aciona a pipeline quando uma tag no formato v*.*.* é criada
   push:
     tags:
       - 'v*.*.*'
