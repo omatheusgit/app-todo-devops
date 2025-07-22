@@ -124,3 +124,5 @@ Projeto de gaveta que veio de uma ideia para automatizar rotina? Talvez.
 Portfólio prático e que mostra conhecimento? Com certeza.
 
 💻 Bora codar e evoluir sempre.
+
+---
