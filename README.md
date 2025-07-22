@@ -15,13 +15,21 @@ Criei esse To-Do simples com objetivo de:
 - integrar variáveis de ambiente (`.env`)
 - empacotar com Docker
 - orquestrar com Docker Compose
-- deixar tudo pronto para CI/CD no futuro
+- contruir as aplicações em Kubernetes de forma declarativa (`yaml`)
+- build e push das imagens no Docker Hub (`ci`)
+- deploy automatizado no cluster Kubernetes em cloud (`cd`)
 
 ---
 
 ## ⚙️ O que foi usado
 
 O projeto foi dividido em dois serviços principais:
+
+### 💡 Frontend
+
+- **Streamlit** para visualização e controle das tarefas
+- Tela única com abas para listar, editar, criar e excluir tarefas
+- Comunicação com a API via `requests`
 
 ### 🧠 Backend
 
@@ -31,17 +39,23 @@ O projeto foi dividido em dois serviços principais:
 - Variáveis de ambiente via `python-dotenv`
 - Roteamento completo para CRUD de tarefas
 
-### 💡 Frontend
 
-- **Streamlit** para visualização e controle das tarefas
-- Tela única com abas para listar, editar, criar e excluir tarefas
-- Comunicação com a API via `requests`
+### 🏗️ Infraestrutura
 
-### 🐳 Infraestrutura
-
-- Dockerfile separado para front e back
-- `.env` isolado para backend
+- Dockerfile separado para frontend e backend
+- `.env` isolados para frontend e backend
 - Compose para orquestrar tudo com 1 comando
+
+---
+
+### 🚢 CI/CD com GitHub Actions e Kubernetes
+
+A pipeline CI/CD automatiza todo o processo com GitHub Actions:
+
+- **CI**: Ao criar uma tag (`vX.Y.Z`), as imagens do backend e frontend são construídas e enviadas ao Docker Hub.
+- **CD**: Após o build, os manifestos YAML são aplicados no cluster Kubernetes da DigitalOcean, atualizando o deploy com a nova versão.
+- **Segurança**: Toda autenticação é feita via secrets (`DOCKERHUB_TOKEN` e `KUBE_CONFIG`).
+- **Extra**: Há um job opcional para destruir os recursos criados com aprovação manual.
 
 ---
 
@@ -87,17 +101,19 @@ Tudo já configurado pra rodar de primeira, desde que tenha Docker e Docker Comp
 - SQLAlchemy
 - Docker
 - Docker Compose
+- Kubernetes (DigitalOcean)
+- GitHub Actions (CI/CD)
 - Arquitetura de microsserviços
 - Manipulação de variáveis com `.env`
 - Criação e consumo de API REST
 - Modularização de projetos em Flask
+- YAML para infraestrutura declarativa
 - Markdown, documentação e boas práticas
 
 ---
 
 ## 🔄 Em desenvolvimento
 
-- CI/CD com GitHub Actions
 - Testes automatizados
 - Ajustes visuais no frontend
 - Refinamento do código
