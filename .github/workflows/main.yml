@@ -12,13 +12,13 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-and-push:
+  CI:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Extrair metadados (tags e labels) para a API
+      - name: Extrair tag para versionamento da API
         id: meta-api
         uses: docker/metadata-action@v5
         with:
@@ -27,7 +27,7 @@ jobs:
             type=ref,event=tag
             type=raw,value=latest,enable=true
 
-      - name: Extrair metadados (tags e labels) para o App
+      - name: Extrair tag para versionamento do App
         id: meta-app
         uses: docker/metadata-action@v5
         with:
