@@ -10,7 +10,7 @@ load_dotenv()
 API_URL = os.getenv('API_URL')
 
 st.set_page_config(page_title="Tarefas ToDo", layout="wide")
-st.title("📝 Gerenciador de Tarefas To-Do")
+st.title("📝 Gerenciador de Tarefas To - Do")
 
 # Função para buscar todas as tarefas
 def buscar_tarefas():
